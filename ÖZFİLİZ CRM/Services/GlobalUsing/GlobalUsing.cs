@@ -1,0 +1,1 @@
+﻿global using ÖZFİLİZ_CRM.Pages.LoginService;

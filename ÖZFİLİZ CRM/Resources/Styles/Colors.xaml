@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Color x:Key="White">White</Color>
+    <Color x:Key="Black">Black</Color>
+
+    <Color x:Key="Primary">#1e1e1e</Color>
+    <Color x:Key="Secondary">#252526</Color>
+    <Color x:Key="Thirdy">#2d2d30</Color>
+    <Color x:Key="Fourty">#3e3e42</Color>
+    <Color x:Key="Fivety">#3742fa</Color>
+
+    <Color x:Key="WhitePrimary">#d0d0d0</Color>
+    <Color x:Key="WhiteSecondary">#e1e1e1</Color>
+    <Color x:Key="WhiteThirdy">#ececec</Color>
+    <Color x:Key="WhiteFourty">#f6f6f6</Color>
+    <Color x:Key="WhiteFivety">#3742fa</Color>
+
+
+</ResourceDictionary>

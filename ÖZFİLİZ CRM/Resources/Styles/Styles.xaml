@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Style TargetType="Page" x:Key="PageStl">
+        <Setter Property="Shell.NavBarIsVisible" Value="False"/>
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Dark={StaticResource Primary}, Light={StaticResource WhitePrimary}}"/>
+    </Style>
+
+    <Style TargetType="Label" x:Key="LblStl">
+        <Setter Property="TextColor" Value="{AppThemeBinding Dark={StaticResource Secondary}, Light={StaticResource WhiteSecondary}}"/>
+    </Style>
+
+    <Style TargetType="Border" x:Key="BrdStl">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Dark={StaticResource Secondary}, Light={StaticResource WhiteSecondary}}"/>
+        <Setter Property="StrokeShape" Value="RoundRectangle 10"/>
+    </Style>
+
+    <Style TargetType="Button" x:Key="BtnStl">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Dark={StaticResource Secondary}, Light={StaticResource WhiteSecondary}}"/>
+        <Setter Property="CornerRadius" Value="5"/>
+    </Style>
+
+    <Style TargetType="ImageButton" x:Key="BtnImgStl">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Dark={StaticResource Secondary}, Light={StaticResource WhiteSecondary}}"/>
+    </Style>
+
+</ResourceDictionary>
