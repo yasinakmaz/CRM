@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Window xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ÖZFİLİZ_CRM.Pages.WindowPage.PageWindow"
+             Title="PageWindow">
+
+    <Window.TitleBar>
+        <TitleBar BackgroundColor="#181818" HeightRequest="50" Title="Özfiliz Yazılım" Subtitle="CRM">
+            <TitleBar.Content>
+            </TitleBar.Content>
+            <TitleBar.TrailingContent>
+                <Grid Grid.Row="0" ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
+                    <ImageButton x:Name="BtnSettings" Clicked="BtnSettings_Clicked" Grid.Column="3" HeightRequest="36" WidthRequest="36" BorderWidth="0" BackgroundColor="Transparent" Source="settings.png"></ImageButton>
+                </Grid>
+            </TitleBar.TrailingContent>
+        </TitleBar>
+    </Window.TitleBar>
+</Window>

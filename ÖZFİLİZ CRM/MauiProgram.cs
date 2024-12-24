@@ -18,7 +18,9 @@ namespace ÖZFİLİZ_CRM
 #if DEBUG
     		builder.Logging.AddDebug();
 #endif
+            builder.Services.AddSingleton<PageWindow>();
             builder.Services.AddSingleton<LoadingPage>();
+            builder.Services.AddSingleton<SettingsMenu>();
 
             return builder.Build();
         }

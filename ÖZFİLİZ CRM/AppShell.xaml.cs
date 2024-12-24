@@ -5,7 +5,9 @@
         public AppShell()
         {
             InitializeComponent();
+            Routing.RegisterRoute(nameof(PageWindow), typeof(PageWindow));
             Routing.RegisterRoute(nameof(LoadingPage), typeof(LoadingPage));
+            Routing.RegisterRoute(nameof(SettingsMenu), typeof(SettingsMenu));
         }
     }
 }
