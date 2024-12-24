@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace ÖZFİLİZ_CRM.DataCon
 {
-    public class DataConnection
+    public static class DataConnection
     {
-        // public string DataCon = $"Data Source={};Initial Catalog={};Persist Security Info=True;User ID={};Password={};Encrypt=True;Trust Server Certificate=True;Connection Timeout=30;Application Name=CRM;";
+        public static string DataCon = $"Data Source={PublicClass.SetSqlServer};Initial Catalog={PublicClass.SetSqlDbName};Persist Security Info=True;User ID={PublicClass.SetSqlUserName};Password={PublicClass.SetSqlPassword};Encrypt=True;Trust Server Certificate=True;Connection Timeout=30;Application Name=CRM;";
     }
 }
