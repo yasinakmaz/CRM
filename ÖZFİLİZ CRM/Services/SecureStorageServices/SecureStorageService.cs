@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Maui.Storage;
 
 namespace ÖZFİLİZ_CRM.Services.SecureStorageServices
 {
@@ -24,6 +20,14 @@ namespace ÖZFİLİZ_CRM.Services.SecureStorageServices
             await SecureStorage.Default.SetAsync(PublicClass.SqlUserName, "");
             await SecureStorage.Default.SetAsync(PublicClass.SqlPassword, "");
             await SecureStorage.Default.SetAsync(PublicClass.SqlDbName, "");
+        }
+        public static async Task GetSecureStorage()
+        {
+           PublicClass.SetBaslangic = await SecureStorage.Default.GetAsync(PublicClass.Baslangic) ?? "0";
+           PublicClass.SetSqlServer = await SecureStorage.Default.GetAsync(PublicClass.SqlServer) ?? "127.0.0.1";
+           PublicClass.SetSqlUserName = await SecureStorage.Default.GetAsync(PublicClass.SqlUserName) ?? "sa";
+           PublicClass.SetSqlPassword = await SecureStorage.Default.GetAsync(PublicClass.SqlPassword) ?? "";
+           PublicClass.SetSqlDbName = await SecureStorage.Default.GetAsync(PublicClass.SqlDbName) ?? "";
         }
 
         public static async Task SetBaslangicAsync()

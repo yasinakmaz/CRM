@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ÖZFİLİZ_CRM.Services.PublicRead
+﻿namespace ÖZFİLİZ_CRM.Services.PublicRead
 {
     public static class PublicClass
     {

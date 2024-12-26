@@ -16,7 +16,7 @@
     </Style>
 
     <Style TargetType="Entry" x:Key="EntStl">
-        <Setter Property="TextColor" Value="{AppThemeBinding Dark={StaticResource WhiteSecondary}, Light={StaticResource Primary}}"/>
+        <Setter Property="TextColor" Value="{AppThemeBinding Dark={StaticResource White}, Light={StaticResource Primary}}"/>
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Dark={StaticResource Secondary}, Light={StaticResource WhitePrimary}}"/>
         <Setter Property="ClearButtonVisibility" Value="WhileEditing"/>
     </Style>

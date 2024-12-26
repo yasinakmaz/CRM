@@ -7,6 +7,7 @@
         <BackButtonBehavior IsVisible="False" IsEnabled="False" />
     </Shell.BackButtonBehavior>
 
+    <ScrollView Orientation="Both">
     <Grid>
         <Grid HorizontalOptions="Center" VerticalOptions="Center" ColumnSpacing="10" RowSpacing="10">
             <Grid Grid.Row="1" Grid.Column="1" x:Name="ProfileGrid">
@@ -18,7 +19,7 @@
                                 <Image Source="user.png"></Image>
                             </Border>
                             <Entry Grid.Column="1" IsPassword="True" Placeholder="Parola" HeightRequest="50" VerticalOptions="Start" Margin="10,20,10,0" Style="{StaticResource EntStl}"></Entry>
-                            <Button Grid.Column="0" VerticalOptions="End" HorizontalOptions="Start" HeightRequest="50" Text="Kullanıcı Seç" Style="{StaticResource BtnStl}"></Button>
+                            <Button Grid.Column="0" x:Name="BtnUserChange" Clicked="BtnUserChange_Clicked" VerticalOptions="End" HorizontalOptions="Start" HeightRequest="50" Text="Kullanıcı Seç" Style="{StaticResource BtnStl}"></Button>
                             <Button Grid.Column="1" VerticalOptions="End" HeightRequest="50" Text="Giriş Yap" Margin="10,0,10,0" Style="{StaticResource BtnStl}"></Button>
                         </Grid>
                     </Grid>
@@ -26,15 +27,16 @@
             </Grid>
 
             <Grid x:Name="NonProfileGrid" IsVisible="False" IsEnabled="False" Grid.Row="1" Grid.Column="1">
-                
+
             </Grid>
         </Grid>
 
         <Grid HorizontalOptions="Start" Margin="10">
-            <Border Style="{StaticResource BrdStl}" WidthRequest="300">
-                <ListView></ListView>
+            <Border x:Name="UserBorder" IsVisible="False" Style="{StaticResource BrdStl}" WidthRequest="300">
+                <ListView x:Name="UserListView" IsVisible="False"></ListView>
             </Border>
         </Grid>
     </Grid>
+    </ScrollView>
 
 </ContentPage>

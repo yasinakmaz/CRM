@@ -9,7 +9,7 @@
     </Shell.BackButtonBehavior>
 
     <StackLayout Margin="10" Orientation="Vertical" Spacing="10">
-        <Button Text="←" HorizontalOptions="Start" Margin="10"></Button>
+        <Button Text="←" HorizontalOptions="Start" x:Name="BtnBack" Clicked="BtnBack_Clicked" Margin="10"></Button>
         <Grid HeightRequest="90" RowDefinitions="30,*">
             <Label Style="{StaticResource LblStl}" Text="Sql Bağlantı Ayarları ↓"></Label>
             <Border Style="{StaticResource BrdStl}" Grid.Row="1">
@@ -18,8 +18,8 @@
                     <Entry Grid.Column="1" Placeholder="Kullanıcı Adı" x:Name="TxtSqlUserName" TextChanged="TxtSqlUserName_TextChanged" Style="{StaticResource EntStl}"></Entry>
                     <Entry Grid.Column="2" Placeholder="Parola" IsPassword="True" x:Name="TxtSqlPassword" TextChanged="TxtSqlPassword_TextChanged" Style="{StaticResource EntStl}"></Entry>
                     <Button ImageSource="connect.png" Grid.Column="3" Style="{StaticResource BtnStl}" x:Name="DbCon" Clicked="DbCon_Clicked" Text="Bağlan"></Button>
-                    <Picker Grid.Column="4" x:Name="DataPicker"></Picker>
-                    <Button ImageSource="save.png" Grid.Column="5" Style="{StaticResource BtnStl}" Text="Kaydet"></Button>
+                    <Picker Grid.Column="4" x:Name="DataPicker" SelectedIndexChanged="DataPicker_SelectedIndexChanged"></Picker>
+                    <Button ImageSource="save.png" Grid.Column="5" Style="{StaticResource BtnStl}" x:Name="BtnSqlSave" Clicked="BtnSqlSave_Clicked" Text="Kaydet"></Button>
                 </Grid>
             </Border>
         </Grid>

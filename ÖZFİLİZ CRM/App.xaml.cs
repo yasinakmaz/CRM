@@ -7,6 +7,7 @@
         {
             InitializeComponent();
             windowTest = WindowTest;
+            SecureStorageService.GetSecureStorage();
         }
 
         protected override Window CreateWindow(IActivationState? activationState)

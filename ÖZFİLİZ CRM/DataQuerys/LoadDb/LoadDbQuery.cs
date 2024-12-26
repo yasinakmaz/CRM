@@ -10,13 +10,10 @@ namespace ÖZFİLİZ_CRM.DataQuerys.LoadDb
     {
         public static List<string> OnPush()
         {
+            ConnectionDbQuery.OnPush();
             var items = new List<string>();
-
-            using (SqlConnection connection = new SqlConnection())
-            {
-                connection.Open();
                 string query = "SELECT name FROM sys.databases;";
-                using (SqlCommand command = new SqlCommand(query, connection))
+                using (SqlCommand command = new SqlCommand(query, ConnectionDbQuery.connection))
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -24,8 +21,6 @@ namespace ÖZFİLİZ_CRM.DataQuerys.LoadDb
                         items.Add(reader.GetString(0));
                     }
                 }
-            }
-
             return items;
         }
     }
