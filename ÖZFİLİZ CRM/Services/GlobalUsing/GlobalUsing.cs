@@ -11,6 +11,7 @@ global using ÖZFİLİZ_CRM.DataCon;
 
 global using ÖZFİLİZ_CRM.DataQuerys.LoadDb;
 global using ÖZFİLİZ_CRM.DataQuerys.DataConnectionQuerys;
+global using ÖZFİLİZ_CRM.DataQuerys.UserListView;
 
 global using Microsoft.Data.Sql;
 global using Microsoft.Data.SqlClient;

@@ -1,5 +1,3 @@
-using Microsoft.UI.Xaml.Automation.Peers;
-
 namespace ÖZFİLİZ_CRM.Pages.LoginService;
 
 public partial class LoadingPage : ContentPage
@@ -7,7 +5,14 @@ public partial class LoadingPage : ContentPage
 	public LoadingPage()
 	{
 		InitializeComponent();
-	}
+        UserListView.ItemsSource = UserListViewLoad.Users;
+        _ = LoadUsersAsync();
+    }
+
+    private async Task LoadUsersAsync()
+    {
+        await UserListViewLoad.OnPushAsync();
+    }
 
     private void BtnUserChange_Clicked(object sender, EventArgs e)
     {

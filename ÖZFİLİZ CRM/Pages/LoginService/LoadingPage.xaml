@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ÖZFİLİZ_CRM.Pages.LoginService.LoadingPage"
+             xmlns:models="clr-namespace:ÖZFİLİZ_CRM.Models"
              Style="{StaticResource PageStl}">
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" IsEnabled="False" />
@@ -32,8 +33,20 @@
         </Grid>
 
         <Grid HorizontalOptions="Start" Margin="10">
-            <Border x:Name="UserBorder" IsVisible="False" Style="{StaticResource BrdStl}" WidthRequest="300">
-                <ListView x:Name="UserListView" IsVisible="False"></ListView>
+            <Border x:Name="UserBorder" Style="{StaticResource BrdStl}" WidthRequest="300">
+                <ListView x:Name="UserListView">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:UserModel">
+                                <ViewCell>
+                                    <Grid ColumnDefinitions="50,*,50">
+                                        <Image Grid.Column="0" Source="user.png" Aspect="Center"></Image>
+                                        <Label Grid.Column="1" Style="{StaticResource LblStl}" Text="{Binding UserName}"></Label>
+                                        <Label Grid.Column="2" Style="{StaticResource LblStl}" Text="→" FontSize="Header"></Label>
+                                    </Grid>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                </ListView>
             </Border>
         </Grid>
     </Grid>
