@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:syncfusion="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:chart="clr-namespace:Syncfusion.Maui.Charts;assembly=Syncfusion.Maui.Charts"
+             xmlns:datagrid="clr-namespace:Syncfusion.Maui.DataGrid;assembly=Syncfusion.Maui.DataGrid"
+             xmlns:listview="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+             xmlns:inputs="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+             xmlns:pdfviewer="clr-namespace:Syncfusion.Maui.PdfViewer;assembly=Syncfusion.Maui.PdfViewer"
+             xmlns:popup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
+             xmlns:tabview="clr-namespace:Syncfusion.Maui.TabView;assembly=Syncfusion.Maui.TabView"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:signaturepad="clr-namespace:Syncfusion.Maui.SignaturePad;assembly=Syncfusion.Maui.SignaturePad"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="CRM.MainPage">
+
+    <tabview:SfTabView Style="{StaticResource TabViewStl}">
+        <tabview:SfTabItem Style="{StaticResource TabItemStl}" Content="Dashboard" ImageSource="dashboard.png" ImagePosition="Left">
+            
+        </tabview:SfTabItem>
+
+        <tabview:SfTabItem Style="{StaticResource TabItemStl}" Content="Servis Formu" ImageSource="agreement.png" ImagePosition="Left">
+
+        </tabview:SfTabItem>
+
+        <tabview:SfTabItem Style="{StaticResource TabItemStl}" Content="Profilim" ImageSource="resume.png" ImagePosition="Left">
+            
+        </tabview:SfTabItem>
+
+        <tabview:SfTabItem Style="{StaticResource TabItemStl}" Content="Service Formu" ImageSource="records.png" ImagePosition="Left">
+
+        </tabview:SfTabItem>
+    </tabview:SfTabView>
+
+</ContentPage>
