@@ -16,7 +16,7 @@
              x:DataType="vm:MainPageViewModel"
              x:Class="CRM.MainPage">
 
-    <tabview:SfTabView Style="{StaticResource TabViewStl}" SelectedIndex="4">
+    <tabview:SfTabView Style="{StaticResource TabViewStl}" SelectedIndex="3" EnableSwiping="False">
         <tabview:SfTabItem Style="{StaticResource TabItemStl}" Header="Dashboard" ImageSource="dashboard.png">
             
         </tabview:SfTabItem>
@@ -36,8 +36,8 @@
                     </Grid>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10" HeightRequest="20">
-                        <Label Grid.Column="0" Style="{StaticResource LblBody}" Text="Kurumsal"/>
-                        <Label Grid.Column="1" Style="{StaticResource LblBody}" Text="ÖZFİLİZ YAZILIM"/>
+                        <Label Grid.Column="0" Style="{StaticResource LblBody}" Text="{Binding AddServiceVm.Type}"/>
+                        <Label Grid.Column="1" Style="{StaticResource LblBody}" Text="{Binding AddServiceVm.BusinessName}"/>
                     </Grid>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10" HeightRequest="25">
@@ -46,8 +46,8 @@
                     </Grid>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10" HeightRequest="20">
-                        <Label Grid.Column="0" Style="{StaticResource LblBody}" Text="12173525938"/>
-                        <Label Grid.Column="1" Style="{StaticResource LblBody}" Text="Ege Vg."/>
+                        <Label Grid.Column="0" Style="{StaticResource LblBody}" Text="{Binding AddServiceVm.TaxNumber}"/>
+                        <Label Grid.Column="1" Style="{StaticResource LblBody}" Text="{Binding AddServiceVm.TaxOffice}"/>
                     </Grid>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10" HeightRequest="25">
@@ -56,17 +56,16 @@
                     </Grid>
 
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="10" HeightRequest="20">
-                        <Label Grid.Column="0" Style="{StaticResource LblBody}" Text="Yasin Akmaz"/>
-                        <Label Grid.Column="1" Style="{StaticResource LblBody}" Text="0553 952 81 55"/>
+                        <Label Grid.Column="0" Style="{StaticResource LblBody}" Text="{Binding AddServiceVm.AuthNameAndSurname}"/>
+                        <Label Grid.Column="1" Style="{StaticResource LblBody}" Text="{Binding AddServiceVm.PhoneNumber}"/>
                     </Grid>
 
                     <Border Style="{StaticResource BrdStandart}"/>
 
                     <Label Style="{StaticResource LblHeader}" Text="Tarih Bilgileri"/>
 
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10" HeightRequest="20">
-                        <Label Grid.Column="0" Style="{StaticResource LblBody}" Text="10.05.2025"/>
-                        <Label Grid.Column="1" Style="{StaticResource LblBody}" Text="10:13"/>
+                    <Grid ColumnDefinitions="*" ColumnSpacing="10" HeightRequest="20">
+                        <Label Style="{StaticResource LblBody}" Text="{Binding AddServiceVm.HeaderserviceDate}"/>
                     </Grid>
 
                     <buttons:SfButton Style="{StaticResource SfBtn}" Text="Tarih" HeightRequest="25"/>
@@ -75,12 +74,12 @@
 
                     <Label Style="{StaticResource LblHeader}" Text="Servis Tutarları"/>
 
-                    <buttons:SfButton Style="{StaticResource SfBtn}" Text="Tutar Ekle" HeightRequest="25"/>
+                    <buttons:SfButton Style="{StaticResource SfBtn}" Command="{Binding AddServiceVm.AddExpenseCommand}" Text="Tutar Ekle" HeightRequest="25"/>
 
-                    <datagrid:SfDataGrid Style="{StaticResource DataGridStandart}">
+                    <datagrid:SfDataGrid Style="{StaticResource DataGridStandart}" AllowEditing="True" EditTapAction="OnDoubleTap" ColumnWidthMode="Fill" ItemsSource="{Binding AddServiceVm.Expense}">
                         <datagrid:SfDataGrid.Columns>
-                            <datagrid:DataGridNumericColumn HeaderText="Tutar"/>
-                            <datagrid:DataGridTextColumn HeaderText="Açıklama"/>
+                            <datagrid:DataGridNumericColumn MappingName="AMOUNT" HeaderText="Tutar" Format="C2"/>
+                            <datagrid:DataGridTextColumn MappingName="COMMENT" HeaderText="Açıklama"/>
                         </datagrid:SfDataGrid.Columns>
                     </datagrid:SfDataGrid>
                 </VerticalStackLayout>
@@ -93,24 +92,72 @@
 
         </tabview:SfTabItem>
 
+        <tabview:SfTabItem Style="{StaticResource TabItemStl}" Header="Müşteriler" ImageSource="organization.png">
+            <Grid>
+                <Grid Margin="10">
+                    <Grid RowDefinitions="auto,*,50" RowSpacing="10">
+                        <Label Grid.Row="0" Style="{StaticResource LblHeader}" Text="Müşteriler"/>
+
+                        <datagrid:SfDataGrid Grid.Row="1" Style="{StaticResource DataGridStandart}" ItemsSource="{Binding AddServiceVm.Business}">
+                            <datagrid:SfDataGrid.Columns>
+                                <datagrid:DataGridTextColumn MappingName="TypeText" HeaderText="Tip"/>
+                                <datagrid:DataGridTextColumn MappingName="BUSINESSNAME" HeaderText="Firma Adı"/>
+                                <datagrid:DataGridCheckBoxColumn MappingName="BUSINESSTAXTYPE" HeaderText="Vergi Tipi"/>
+                                <datagrid:DataGridTextColumn MappingName="TAXNUMBER" HeaderText="Vergi No"/>
+                                <datagrid:DataGridTextColumn MappingName="TAXOFFICE" HeaderText="Vergi Dairesi"/>
+                                <datagrid:DataGridTextColumn MappingName="AUTHNAMEANDSURNAME" HeaderText="Yetkili"/>
+                                <datagrid:DataGridTextColumn MappingName="PHONENUMBER" HeaderText="Tel No"/>
+                                <datagrid:DataGridDateColumn MappingName="CREATEDATE" HeaderText="Oluşturulma Tarihi"/>
+                                <datagrid:DataGridDateColumn MappingName="LASTUPDATE" HeaderText="Son Güncelleme Tarihi"/>
+                                <datagrid:DataGridTextColumn MappingName="CREATORUSER" HeaderText="Oluşturan Kullanıcı"/>
+                                <datagrid:DataGridTextColumn MappingName="LASTUPDATEUSER" HeaderText="Son Güncelleyen Kullanıcı"/>
+                            </datagrid:SfDataGrid.Columns>
+                        </datagrid:SfDataGrid>
+                    </Grid>
+
+                    <ImageButton BackgroundColor="Transparent" BorderColor="Transparent" Source="save.png" WidthRequest="50" HeightRequest="50" HorizontalOptions="Start" VerticalOptions="End"/>
+
+                    <ImageButton BackgroundColor="Transparent" BorderColor="Transparent" x:Name="BtnAddBusiness" Clicked="BtnAddBusiness_Clicked" Source="add.png" WidthRequest="50" HeightRequest="50" HorizontalOptions="End" VerticalOptions="End"/>
+                </Grid>
+                <popup:SfPopup Style="{StaticResource PopupStd}" HeaderTitle="Müşteri Ekle" x:Name="BusinessAddPop">
+                    <popup:SfPopup.ContentTemplate>
+                        <DataTemplate>
+                            <Grid Margin="20">
+                                <VerticalStackLayout Spacing="10">
+                                    <Entry Style="{StaticResource TxtEnt}" Placeholder="Firma Tipi"/>
+                                    <Entry Style="{StaticResource TxtEnt}" Placeholder="Firma Adı"/>
+                                    <inputs:SfComboBox Style="{StaticResource CmbSfStd}" Placeholder="Vergi Tipi"/>
+                                    <inputs:SfNumericEntry Style="{StaticResource TxtNmc}" Placeholder="Vergi Numarası" CustomFormat="0"/>
+                                    <Entry Style="{StaticResource TxtEnt}" Placeholder="Vergi Dairesi"/>
+                                    <Entry Style="{StaticResource TxtEnt}" Placeholder="Yetkili"/>
+                                    <inputs:SfMaskedEntry Style="{StaticResource TxtMsc}" Placeholder="Telefon Numarası" Mask="0/000/000/00/00"/>
+                                    <buttons:SfButton Style="{StaticResource SfBtn}" Text="Kaydet"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </popup:SfPopup.ContentTemplate>
+                </popup:SfPopup>
+            </Grid>
+        </tabview:SfTabItem>
+
         <tabview:SfTabItem Style="{StaticResource TabItemStl}" Header="Profilim" ImageSource="resume.png">
             
         </tabview:SfTabItem>
 
-        <tabview:SfTabItem Style="{StaticResource TabItemStl}" x:DataType="vm:SettingsViewModel" Header="Ayarlar" ImageSource="wrench.png">
+        <tabview:SfTabItem Style="{StaticResource TabItemStl}" Header="Ayarlar" ImageSource="wrench.png">
             <Grid Margin="10">
                 <VerticalStackLayout Spacing="10">
                     <Label Style="{StaticResource LblHeader}" Text="Ayarlar"/>
 
-                    <Entry Style="{StaticResource TxtEnt}" Text="{Binding Mssqlserver}" Placeholder="MSSQL SERVER"/>
+                    <Entry Style="{StaticResource TxtEnt}" Text="{Binding SettingsVm.Mssqlserver}" Placeholder="MSSQL SERVER"/>
 
-                    <Entry Style="{StaticResource TxtEnt}" Text="{Binding Mssqlusername}" Placeholder="MSSQL USER NAME"/>
+                    <Entry Style="{StaticResource TxtEnt}" Text="{Binding SettingsVm.Mssqlusername}" Placeholder="MSSQL USER NAME"/>
 
-                    <Entry Style="{StaticResource TxtEnt}" Text="{Binding Mssqlpassword}" Placeholder="MSSQL PASSWORD" IsPassword="True"/>
+                    <Entry Style="{StaticResource TxtEnt}" Text="{Binding SettingsVm.Mssqlpassword}" Placeholder="MSSQL PASSWORD" IsPassword="True"/>
 
                     <buttons:SfButton Style="{StaticResource SfBtn}" Command="{Binding CheckDatabaseCommand}" Text="Bağlantıyı Sağla"/>
 
-                    <inputs:SfComboBox Style="{StaticResource CmbSfStd}" SelectedValue="{Binding Mssqldata}" Text="{Binding Mssqldata}" ItemsSource="{Binding databases}" Placeholder="Database"/>
+                    <inputs:SfComboBox Style="{StaticResource CmbSfStd}" SelectedValue="{Binding SettingsVm.Mssqldata}" Text="{Binding SettingsVm.Mssqldata}" ItemsSource="{Binding SettingsVm.databases}" Placeholder="Database"/>
 
                     <buttons:SfButton Style="{StaticResource SfBtn}" Command="{Binding SaveMssqlSettingsCommand}" Text="Kaydet"/>
                 </VerticalStackLayout>

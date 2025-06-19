@@ -7,5 +7,10 @@
             InitializeComponent();
             BindingContext = viewModel;
         }
+
+        private async void BtnAddBusiness_Clicked(object sender, EventArgs e)
+        {
+            await BusinessAddPop.ShowAsync();
+        }
     }
 }
