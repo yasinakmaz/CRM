@@ -21,8 +21,13 @@
                     fonts.AddFont("EthosNova-Regular.ttf", "EthosNovaRegular");
                 });
 
+            builder.Services.AddTransient<AddServiceViewModel>();
+            builder.Services.AddTransient<SettingsViewModel>();
+            builder.Services.AddTransient<MainPageViewModel>();
+
+            builder.Services.AddTransient<MainPage>();
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();

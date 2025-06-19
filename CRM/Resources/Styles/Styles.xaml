@@ -30,6 +30,14 @@
         <Setter Property="VerticalOptions" Value="Center"/>
     </Style>
 
+    <Style TargetType="Label" x:Key="LblBody">
+        <Setter Property="FontFamily" Value="EthosNovaMedium"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="HorizontalOptions" Value="Center"/>
+        <Setter Property="LineBreakMode" Value="TailTruncation"/>
+    </Style>
+
     <Style TargetType="buttons:SfRadioButton" x:Key="SfRadioBtn">
         <Setter Property="CheckedColor" Value="{AppThemeBinding Dark={StaticResource White},Light={StaticResource Black}}"/>
         <Setter Property="TextColor" Value="{AppThemeBinding Dark={StaticResource White},Light={StaticResource Black}}"/>
@@ -180,23 +188,25 @@
     <Style TargetType="tabview:SfTabItem" x:Key="TabItemStl">
         <Setter Property="TextColor" Value="{AppThemeBinding Dark={StaticResource White}, Light={StaticResource Black}}"/>
         <Setter Property="FontFamily" Value="EthosNovaBold"/>
-        <Setter Property="ImagePosition" Value="Left"/>
-        <Setter Property="ImageSize" Value="50"/>
+        <Setter Property="ImagePosition" Value="Top"/>
+        <Setter Property="ImageSize" Value="30"/>
     </Style>
 
     <Style TargetType="tabview:SfTabView" x:Key="TabViewStl">
-        <Setter Property="ScrollButtonBackground" Value="{AppThemeBinding Dark={StaticResource White}, Light={StaticResource Black}}"/>
-        <Setter Property="ScrollButtonColor" Value="{AppThemeBinding Dark={StaticResource Black}, Light={StaticResource White}}"/>
+        <Setter Property="IsScrollButtonEnabled" Value="True"/>
+        <Setter Property="ScrollButtonBackground" Value="{AppThemeBinding Dark={StaticResource PrimaryDark}, Light={StaticResource PrimaryWhite}}"/>
+        <Setter Property="ScrollButtonColor" Value="{AppThemeBinding Dark={StaticResource White}, Light={StaticResource Black}}"/>
         <Setter Property="ContentTransitionDuration" Value="200"/>
         <Setter Property="TabBarHeight" Value="40"/>
         <Setter Property="HeaderHorizontalTextAlignment" Value="Center"/>
-        <Setter Property="TabBarPlacement" Value="Bottom"/>
+        <Setter Property="TabBarPlacement" Value="Top"/>
         <Setter Property="EnableSwiping" Value="True"/>
         <Setter Property="IndicatorPlacement" Value="Fill"/>
         <Setter Property="IndicatorCornerRadius" Value="5"/>
         <Setter Property="IndicatorStrokeThickness" Value="2"/>
         <Setter Property="IndicatorBackground" Value="{StaticResource Blue}"/>
-        <Setter Property="IndicatorWidthMode" Value="Fit"/>
+        <Setter Property="IndicatorWidthMode" Value="Stretch"/>
         <Setter Property="EnableVirtualization" Value="False"/>
+        <Setter Property="TabBarHeight" Value="60"/>
     </Style>
 </ResourceDictionary>
