@@ -124,14 +124,21 @@
                         <DataTemplate>
                             <Grid Margin="20">
                                 <VerticalStackLayout Spacing="10">
-                                    <Entry Style="{StaticResource TxtEnt}" Placeholder="Firma Tipi"/>
-                                    <Entry Style="{StaticResource TxtEnt}" Placeholder="Firma Adı"/>
-                                    <inputs:SfComboBox Style="{StaticResource CmbSfStd}" Placeholder="Vergi Tipi"/>
-                                    <inputs:SfNumericEntry Style="{StaticResource TxtNmc}" Placeholder="Vergi Numarası" CustomFormat="0"/>
-                                    <Entry Style="{StaticResource TxtEnt}" Placeholder="Vergi Dairesi"/>
-                                    <Entry Style="{StaticResource TxtEnt}" Placeholder="Yetkili"/>
-                                    <inputs:SfMaskedEntry Style="{StaticResource TxtMsc}" Placeholder="Telefon Numarası" Mask="0/000/000/00/00"/>
-                                    <buttons:SfButton Style="{StaticResource SfBtn}" Text="Kaydet"/>
+                                    <Entry Style="{StaticResource TxtEnt}" Text="{Binding AddServiceVm.Type}" Placeholder="Firma Tipi"/>
+                                    <Entry Style="{StaticResource TxtEnt}" Placeholder="Firma Adı" Text="{Binding AddServiceVm.BusinessName}"/>
+                                    <inputs:SfComboBox Style="{StaticResource CmbSfStd}" Placeholder="Vergi Tipi" Text="{Binding AddServiceVm.BusinessTaxType}">
+                                        <inputs:SfComboBox.ItemsSource>
+                                            <x:Array Type="{Type x:String}">
+                                                <x:String>Gerçek</x:String>
+                                                <x:String>Tüzel</x:String>
+                                            </x:Array>
+                                        </inputs:SfComboBox.ItemsSource>
+                                    </inputs:SfComboBox>
+                                    <inputs:SfNumericEntry Style="{StaticResource TxtNmc}" Placeholder="Vergi Numarası" Value="{Binding AddServiceVm.TaxNumber}" CustomFormat="0"/>
+                                    <Entry Style="{StaticResource TxtEnt}" Placeholder="Vergi Dairesi" Text="{Binding AddServiceVm.TaxOffice}"/>
+                                    <Entry Style="{StaticResource TxtEnt}" Placeholder="Yetkili" Text="{Binding AddServiceVm.AuthNameAndSurname}"/>
+                                    <inputs:SfMaskedEntry Style="{StaticResource TxtMsc}" Placeholder="Telefon Numarası" Mask="0/000/000/00/00" Value="{Binding AddServiceVm.PhoneNumber}"/>
+                                    <buttons:SfButton Style="{StaticResource SfBtn}" Text="Kaydet" Command="{Binding AddServiceVm.AddBusinessCommand}"/>
                                 </VerticalStackLayout>
                             </Grid>
                         </DataTemplate>

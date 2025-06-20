@@ -21,6 +21,42 @@
                     fonts.AddFont("EthosNova-Regular.ttf", "EthosNovaRegular");
                 });
 
+            builder.Services.AddDbContextFactory<AppDbContext>(options =>
+            {
+                try
+                {
+                    var connectionString = $"Data Source={PublicSettings.MSSQLSERVER};Initial Catalog={PublicSettings.MSSQLDATABASE};Persist Security Info=False;User ID={PublicSettings.MSSQLUSERNAME};Password={PublicSettings.MSSQLPASSWORD};Encrypt=True;Trust Server Certificate=True;Connection Timeout=30;Command Timeout=300;Pooling=True;Application Name=CRM-{AppInfo.VersionString};";
+
+                    var debugConnectionString = connectionString.Replace(PublicSettings.MSSQLPASSWORD, "***");
+                    System.Diagnostics.Debug.WriteLine($"Connection String: {debugConnectionString}");
+
+                    options.UseSqlServer(connectionString, sqloptions =>
+                    {
+                        sqloptions.CommandTimeout(300);
+                        sqloptions.EnableRetryOnFailure(
+                            maxRetryCount: 3,
+                            maxRetryDelay: TimeSpan.FromSeconds(10),
+                            errorNumbersToAdd: null);
+                        sqloptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                    })
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                    .EnableServiceProviderCaching(true)
+                    .EnableDetailedErrors(true)
+                    .EnableSensitiveDataLogging(true)
+                    .LogTo(message => System.Diagnostics.Debug.WriteLine(message))
+                    .ConfigureWarnings(warnings =>
+                    {
+                        warnings.Ignore(CoreEventId.RowLimitingOperationWithoutOrderByWarning);
+                        warnings.Ignore(SqlServerEventId.DecimalTypeDefaultWarning);
+                    });
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"DbContext configuration error: {ex.Message}");
+                    throw;
+                }
+            }, ServiceLifetime.Singleton);
+
             builder.Services.AddTransient<AddServiceViewModel>();
             builder.Services.AddTransient<SettingsViewModel>();
             builder.Services.AddTransient<MainPageViewModel>();

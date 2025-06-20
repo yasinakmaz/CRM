@@ -43,4 +43,5 @@ global using CRM.ViewModels;
 global using CRM.Models;
 global using CRM.Services;
 global using Microsoft.Data.Sql;
+global using Microsoft.EntityFrameworkCore.Diagnostics;
 global using Microsoft.Data.SqlClient;

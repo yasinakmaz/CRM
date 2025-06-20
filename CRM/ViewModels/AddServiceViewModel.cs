@@ -1,7 +1,10 @@
-﻿namespace CRM.ViewModels
+﻿using Microsoft.EntityFrameworkCore.Internal;
+
+namespace CRM.ViewModels
 {
     public partial class AddServiceViewModel : ObservableObject
     {
+        private readonly IDbContextFactory<AppDbContext> _contextFactory;
         #region ObservableProperty
         #region BUSINESS
         [ObservableProperty]
@@ -9,7 +12,7 @@
         private int businessind;
 
         [ObservableProperty]
-        private int type;
+        private string type;
 
         [ObservableProperty]
         private string? businessName;
@@ -30,7 +33,7 @@
         private string? phoneNumber;
 
         [ObservableProperty]
-        private DateTime businesscreateDate;
+        private DateTime businesscreateDate = DateTime.UtcNow;
 
         [ObservableProperty]
         private DateTime businesslastUpdate;
@@ -104,9 +107,68 @@
         public ObservableCollection<ServiceFormExpenseDetail> Expense { get; set; } = new ObservableCollection<ServiceFormExpenseDetail>();
         #endregion
 
-        public AddServiceViewModel()
+        public AddServiceViewModel(IDbContextFactory<AppDbContext> contextFactory)
         {
+            _contextFactory = contextFactory;
+        }
 
+
+        [RelayCommand]
+        public async Task AddBusiness()
+        {
+            try
+            {
+                using var context = _contextFactory.CreateDbContext();
+
+                var businessitem = new Business
+                {
+                    TYPE = Type,
+                    BUSINESSNAME = BusinessName,
+                    BUSINESSTAXTYPE = BusinessTaxType,
+                    TAXNUMBER = TaxNumber,
+                    TAXOFFICE = TaxOffice,
+                    AUTHNAMEANDSURNAME = AuthNameAndSurname,
+                    PHONENUMBER = PhoneNumber,
+                    CREATEDATE = BusinesscreateDate,
+                    CREATORUSERIND = 1
+                };
+
+                await context.AddAsync(businessitem);
+                int i = await context.SaveChangesAsync();
+
+                if (i > 0)
+                {
+                    await Shell.Current.DisplayAlert("Sistem", "Başarıyla Kaydedildi", "Tamam");
+                }
+            }
+            catch (DbUpdateException ex)
+            {
+                var innerMsg = ex.InnerException?.Message ?? ex.Message;
+                await Shell.Current.DisplayAlert("Sistem", $"Veritabanı Hatası: {innerMsg}", "Tamam");
+                bool answer = await Shell.Current.DisplayAlert("Sistem", "Hata Kopyalansınmı", "Evet","Hayır");
+                if(answer)
+                {
+                    await Clipboard.SetTextAsync($"{innerMsg}");
+                }
+            }
+            catch (SqlException ex)
+            {
+                await Shell.Current.DisplayAlert("Sistem", $"SQL Hatası: {ex.Message}", "Tamam");
+                bool answer = await Shell.Current.DisplayAlert("Sistem", "Hata Kopyalansınmı", "Evet", "Hayır");
+                if (answer)
+                {
+                    await Clipboard.SetTextAsync($"{ex.Message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Sistem", $"Genel Hata: {ex.Message}", "Tamam");
+                bool answer = await Shell.Current.DisplayAlert("Sistem", "Hata Kopyalansınmı", "Evet", "Hayır");
+                if (answer)
+                {
+                    await Clipboard.SetTextAsync($"{ex.Message}");
+                }
+            }
         }
 
         [RelayCommand]

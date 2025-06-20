@@ -5,7 +5,7 @@ namespace CRM.Models
     {
         [Key]
         public int IND { get; set; }
-        public int TYPE { get; set; }
+        public string? TYPE { get; set; }
         public string? BUSINESSNAME { get; set; }
         public bool BUSINESSTAXTYPE { get; set; }
         public string? TAXNUMBER { get; set; }
