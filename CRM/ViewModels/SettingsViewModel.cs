@@ -2,6 +2,8 @@
 {
     public partial class SettingsViewModel : ObservableObject
     {
+        private readonly SemaphoreSlim _connectionSemaphore = new(1, 1);
+
         #region Properties
         [ObservableProperty]
         private string? mssqlserver;
@@ -28,7 +30,7 @@
 
         public SettingsViewModel()
         {
-            
+
         }
 
         public async Task InitializeSettings()
@@ -41,10 +43,25 @@
         {
             try
             {
-                Mssqlserver = await SecureStorage.Default.GetAsync(PublicSettings.mssqlserver) ?? "";
-                Mssqlusername = await SecureStorage.Default.GetAsync(PublicSettings.mssqlusername) ?? "";
-                Mssqlpassword = await SecureStorage.Default.GetAsync(PublicSettings.mssqlpassword) ?? "";
-                Mssqldata = await SecureStorage.Default.GetAsync(PublicSettings.mssqldatabase) ?? "";
+                var tasks = new[]
+                {
+                    SecureStorage.Default.GetAsync(PublicSettings.mssqlserver),
+                    SecureStorage.Default.GetAsync(PublicSettings.mssqlusername),
+                    SecureStorage.Default.GetAsync(PublicSettings.mssqlpassword),
+                    SecureStorage.Default.GetAsync(PublicSettings.mssqldatabase)
+                };
+
+                var results = await Task.WhenAll(tasks);
+
+                Mssqlserver = results[0] ?? string.Empty;
+                Mssqlusername = results[1] ?? string.Empty;
+                Mssqlpassword = results[2] ?? string.Empty;
+                Mssqldata = results[3] ?? string.Empty;
+
+                PublicSettings.MSSQLSERVER = Mssqlserver;
+                PublicSettings.MSSQLUSERNAME = Mssqlusername;
+                PublicSettings.MSSQLPASSWORD = Mssqlpassword;
+                PublicSettings.MSSQLDATABASE = Mssqldata;
             }
             catch (Exception ex)
             {
@@ -59,20 +76,45 @@
             try
             {
                 IsLoading = true;
-                Busytext = "Yükleniyor";
+                Busytext = "Ayarlar kaydediliyor...";
+
+                if (string.IsNullOrWhiteSpace(Mssqlserver) ||
+                    string.IsNullOrWhiteSpace(Mssqlusername) ||
+                    string.IsNullOrWhiteSpace(Mssqlpassword))
+                {
+                    await Shell.Current.DisplayAlert("Uyarı", "Tüm alanları doldurunuz", "Tamam");
+                    return;
+                }
+
+                var saveTasks = new List<Task>();
+
                 if (!string.IsNullOrWhiteSpace(Mssqlserver))
-                    await SecureStorage.Default.SetAsync(PublicSettings.mssqlserver, Mssqlserver);
+                {
+                    saveTasks.Add(SecureStorage.Default.SetAsync(PublicSettings.mssqlserver, Mssqlserver));
+                    PublicSettings.MSSQLSERVER = Mssqlserver;
+                }
 
                 if (!string.IsNullOrWhiteSpace(Mssqlusername))
-                    await SecureStorage.Default.SetAsync(PublicSettings.mssqlusername, Mssqlusername);
+                {
+                    saveTasks.Add(SecureStorage.Default.SetAsync(PublicSettings.mssqlusername, Mssqlusername));
+                    PublicSettings.MSSQLUSERNAME = Mssqlusername;
+                }
 
                 if (!string.IsNullOrWhiteSpace(Mssqlpassword))
-                    await SecureStorage.Default.SetAsync(PublicSettings.mssqlpassword, Mssqlpassword);
+                {
+                    saveTasks.Add(SecureStorage.Default.SetAsync(PublicSettings.mssqlpassword, Mssqlpassword));
+                    PublicSettings.MSSQLPASSWORD = Mssqlpassword;
+                }
 
                 if (!string.IsNullOrWhiteSpace(Mssqldata))
-                    await SecureStorage.Default.SetAsync(PublicSettings.mssqldatabase, Mssqldata);
+                {
+                    saveTasks.Add(SecureStorage.Default.SetAsync(PublicSettings.mssqldatabase, Mssqldata));
+                    PublicSettings.MSSQLDATABASE = Mssqldata;
+                }
 
-                await Shell.Current.DisplayAlert("Sistem", "MSSQL ayarları kaydedildi", "Tamam");
+                await Task.WhenAll(saveTasks);
+
+                await Shell.Current.DisplayAlert("Sistem", "MSSQL ayarları başarıyla kaydedildi", "Tamam");
             }
             catch (Exception ex)
             {
@@ -81,6 +123,7 @@
             finally
             {
                 IsLoading = false;
+                Busytext = string.Empty;
             }
         }
         #endregion
@@ -88,10 +131,13 @@
         #region CheckDatabase Command
         public async Task CheckDatabase()
         {
+            if (IsLoading) return;
+
+            await _connectionSemaphore.WaitAsync();
             try
             {
                 IsLoading = true;
-                Busytext = "Yükleniyor";
+                Busytext = "Veritabanı bağlantısı kontrol ediliyor...";
 
                 databases.Clear();
 
@@ -103,29 +149,81 @@
                     return;
                 }
 
-                string connectionstring = $"Server={Mssqlserver};Database=master;User Id={Mssqlusername};Password={Mssqlpassword};Connection Timeout=30;TrustServerCertificate=True;Encrypt=False;";
-
-                using var connection = new SqlConnection(connectionstring);
-                await connection.OpenAsync();
-
-                using var command = connection.CreateCommand();
-                command.CommandText = "SELECT name FROM sys.databases WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb') ORDER BY name";
-                using var reader = await command.ExecuteReaderAsync();
-
-                while (await reader.ReadAsync())
+                var connectionStringBuilder = new SqlConnectionStringBuilder
                 {
-                    databases.Add(reader.GetString(0));
+                    DataSource = Mssqlserver,
+                    InitialCatalog = "master",
+                    UserID = Mssqlusername,
+                    Password = Mssqlpassword,
+                    ConnectTimeout = 15,
+                    CommandTimeout = 30,
+                    TrustServerCertificate = true,
+                    Encrypt = false,
+                    Pooling = true,
+                    MinPoolSize = 1,
+                    MaxPoolSize = 10
+                };
+
+                using var connection = new SqlConnection(connectionStringBuilder.ConnectionString);
+
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+
+                await connection.OpenAsync(cts.Token);
+
+                const string query = @"
+                    SELECT name 
+                    FROM sys.databases 
+                    WHERE database_id > 4 -- Exclude system databases more efficiently
+                        AND state = 0 -- Only online databases
+                        AND is_read_only = 0 -- Only writable databases
+                    ORDER BY name";
+
+                using var command = new SqlCommand(query, connection);
+                command.CommandTimeout = 15;
+
+                using var reader = await command.ExecuteReaderAsync(cts.Token);
+
+                var databaseList = new List<string>();
+                while (await reader.ReadAsync(cts.Token))
+                {
+                    databaseList.Add(reader.GetString(0));
                 }
 
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    foreach (var db in databaseList)
+                    {
+                        databases.Add(db);
+                    }
+                });
+
                 var message = databases.Count > 0
-                    ? $"Bağlantı sağlandı. {databases.Count} veritabanı bulundu."
-                    : "Bağlantı sağlandı ancak kullanılabilir veritabanı bulunamadı.";
+                    ? $"Bağlantı başarılı! {databases.Count} veritabanı bulundu."
+                    : "Bağlantı başarılı ancak kullanılabilir veritabanı bulunamadı.";
 
                 await Shell.Current.DisplayAlert("Sistem", message, "Tamam");
+
+                if (databases.Count > 0)
+                {
+                    Busytext = "Bağlantı kalitesi test ediliyor...";
+                    await TestConnectionQuality(connectionStringBuilder.ConnectionString, cts.Token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                await Shell.Current.DisplayAlert("Zaman Aşımı", "Veritabanı bağlantısı zaman aşımına uğradı. Sunucu ayarlarınızı kontrol ediniz.", "Tamam");
             }
             catch (SqlException sqlEx)
             {
-                await Shell.Current.DisplayAlert("SQL Hatası", $"Veritabanı bağlantısı başarısız: {sqlEx.Message}", "Tamam");
+                string errorMessage = sqlEx.Number switch
+                {
+                    2 => "Sunucu bulunamadı. Server adresini kontrol ediniz.",
+                    18456 => "Kullanıcı adı veya şifre hatalı.",
+                    53 => "Ağ bağlantısı hatası. Sunucu erişilebilir durumda değil.",
+                    _ => $"SQL Hatası: {sqlEx.Message}"
+                };
+
+                await Shell.Current.DisplayAlert("Bağlantı Hatası", errorMessage, "Tamam");
             }
             catch (Exception ex)
             {
@@ -134,8 +232,46 @@
             finally
             {
                 IsLoading = false;
+                Busytext = string.Empty;
+                _connectionSemaphore.Release();
+            }
+        }
+
+        private async Task TestConnectionQuality(string connectionString, CancellationToken cancellationToken)
+        {
+            try
+            {
+                using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync(cancellationToken);
+
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+                using var command = new SqlCommand("SELECT 1", connection);
+                await command.ExecuteScalarAsync(cancellationToken);
+
+                stopwatch.Stop();
+
+                var responseTime = stopwatch.ElapsedMilliseconds;
+                string qualityMessage = responseTime switch
+                {
+                    < 50 => "Mükemmel",
+                    < 100 => "İyi",
+                    < 300 => "Orta",
+                    _ => "Yavaş"
+                };
+
+                System.Diagnostics.Debug.WriteLine($"Bağlantı kalitesi: {qualityMessage} ({responseTime}ms)");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Bağlantı kalite testi hatası: {ex.Message}");
             }
         }
         #endregion
+
+        public void Dispose()
+        {
+            _connectionSemaphore?.Dispose();
+        }
     }
 }

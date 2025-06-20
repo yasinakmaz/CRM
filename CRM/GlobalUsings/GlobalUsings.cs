@@ -45,3 +45,4 @@ global using CRM.Services;
 global using Microsoft.Data.Sql;
 global using Microsoft.EntityFrameworkCore.Diagnostics;
 global using Microsoft.Data.SqlClient;
+global using CRM.Models.DTOs;

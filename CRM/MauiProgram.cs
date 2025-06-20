@@ -21,52 +21,64 @@
                     fonts.AddFont("EthosNova-Regular.ttf", "EthosNovaRegular");
                 });
 
+            builder.Services.AddMemoryCache();
+
             builder.Services.AddDbContextFactory<AppDbContext>(options =>
             {
-                try
-                {
-                    var connectionString = $"Data Source={PublicSettings.MSSQLSERVER};Initial Catalog={PublicSettings.MSSQLDATABASE};Persist Security Info=False;User ID={PublicSettings.MSSQLUSERNAME};Password={PublicSettings.MSSQLPASSWORD};Encrypt=True;Trust Server Certificate=True;Connection Timeout=30;Command Timeout=300;Pooling=True;Application Name=CRM-{AppInfo.VersionString};";
+                var connectionString = BuildConnectionString();
 
-                    var debugConnectionString = connectionString.Replace(PublicSettings.MSSQLPASSWORD, "***");
-                    System.Diagnostics.Debug.WriteLine($"Connection String: {debugConnectionString}");
-
-                    options.UseSqlServer(connectionString, sqloptions =>
-                    {
-                        sqloptions.CommandTimeout(300);
-                        sqloptions.EnableRetryOnFailure(
-                            maxRetryCount: 3,
-                            maxRetryDelay: TimeSpan.FromSeconds(10),
-                            errorNumbersToAdd: null);
-                        sqloptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-                    })
-                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                    .EnableServiceProviderCaching(true)
-                    .EnableDetailedErrors(true)
-                    .EnableSensitiveDataLogging(true)
-                    .LogTo(message => System.Diagnostics.Debug.WriteLine(message))
-                    .ConfigureWarnings(warnings =>
-                    {
-                        warnings.Ignore(CoreEventId.RowLimitingOperationWithoutOrderByWarning);
-                        warnings.Ignore(SqlServerEventId.DecimalTypeDefaultWarning);
-                    });
-                }
-                catch (Exception ex)
+                options.UseSqlServer(connectionString, sqlOptions =>
                 {
-                    System.Diagnostics.Debug.WriteLine($"DbContext configuration error: {ex.Message}");
-                    throw;
-                }
-            }, ServiceLifetime.Singleton);
+                    sqlOptions.CommandTimeout(30);
+                    sqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 2,
+                        maxRetryDelay: TimeSpan.FromSeconds(5),
+                        errorNumbersToAdd: null);
+                })
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                .EnableServiceProviderCaching(true);
+
+#if DEBUG
+                options.EnableDetailedErrors(true)
+                       .EnableSensitiveDataLogging(true)
+                       .LogTo(message => System.Diagnostics.Debug.WriteLine(message), LogLevel.Warning);
+#endif
+            });
 
             builder.Services.AddTransient<AddServiceViewModel>();
             builder.Services.AddTransient<SettingsViewModel>();
             builder.Services.AddTransient<MainPageViewModel>();
 
             builder.Services.AddTransient<MainPage>();
+
 #if DEBUG
             builder.Logging.AddDebug();
+            builder.Logging.SetMinimumLevel(LogLevel.Warning);
 #endif
 
             return builder.Build();
+        }
+
+        private static string BuildConnectionString()
+        {
+            try
+            {
+                return $"Data Source={PublicSettings.MSSQLSERVER};" +
+                       $"Initial Catalog={PublicSettings.MSSQLDATABASE};" +
+                       $"User ID={PublicSettings.MSSQLUSERNAME};" +
+                       $"Password={PublicSettings.MSSQLPASSWORD};" +
+                       $"TrustServerCertificate=True;" +
+                       $"Encrypt=True;" +
+                       $"Connection Timeout=15;" +
+                       $"Command Timeout=30;" +
+                       $"Pooling=True;" +
+                       $"Application Name=CRM-{AppInfo.VersionString};";
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Connection string build error: {ex.Message}");
+                return "Data Source=.;Initial Catalog=CRM;User ID=sa;Password=123456a.A;TrustServerCertificate=True;Encrypt=True;";
+            }
         }
     }
 }
