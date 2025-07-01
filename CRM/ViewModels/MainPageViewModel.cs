@@ -10,12 +10,21 @@
             AddServiceVm = addservicevm;
             SettingsVm = settingsvm;
 
-            _ = LoadDataAsync();
+            _ = Task.Run(LoadDataAsync);
         }
 
         private async Task LoadDataAsync()
         {
-            await SettingsVm.InitializeSettings();
+            try
+            {
+                await SettingsVm.InitializeSettings();
+
+                await AddServiceVm.LoadBusinessListCommand.ExecuteAsync(null);
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Sistem", $"LoadDataAsync error: {ex.Message}", "Tamam");
+            }
         }
 
         [RelayCommand]
@@ -28,6 +37,8 @@
         private async Task SaveMssqlSettings()
         {
             await SettingsVm.SaveMssqlSettings();
+
+            await AddServiceVm.LoadBusinessListCommand.ExecuteAsync(null);
         }
     }
 }

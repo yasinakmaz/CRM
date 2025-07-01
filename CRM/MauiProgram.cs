@@ -25,21 +25,22 @@
 
             builder.Services.AddDbContextFactory<AppDbContext>(options =>
             {
-                var connectionString = BuildConnectionString();
-
+                var connectionString = "Data Source=.;Initial Catalog=CRM;User ID=sa;Password=123456a.A;TrustServerCertificate=True;Encrypt=False;";
                 options.UseSqlServer(connectionString, sqlOptions =>
                 {
                     sqlOptions.CommandTimeout(300);
                 })
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                .EnableServiceProviderCaching(true);
+                .EnableServiceProviderCaching(false);
 
 #if DEBUG
                 options.EnableDetailedErrors(true)
                        .EnableSensitiveDataLogging(true)
-                       .LogTo(message => Shell.Current.DisplayAlert("Sql Hatası",message,"Tamam"), LogLevel.Warning);
+                       .LogTo(message => System.Diagnostics.Debug.WriteLine($"EF Core: {message}"), LogLevel.Warning);
 #endif
             });
+
+            builder.Services.AddSingleton<DatabaseService>();
 
             builder.Services.AddTransient<AddServiceViewModel>();
             builder.Services.AddTransient<SettingsViewModel>();
@@ -53,30 +54,6 @@
 #endif
 
             return builder.Build();
-        }
-
-        private static string BuildConnectionString()
-        {
-            try
-            {
-                return $"Data Source={PublicSettings.MSSQLSERVER};" +
-                       $"Initial Catalog={PublicSettings.MSSQLDATABASE};" +
-                       $"User ID={PublicSettings.MSSQLUSERNAME};" +
-                       $"Password={PublicSettings.MSSQLPASSWORD};" +
-                       $"TrustServerCertificate=True;" +
-                       $"Encrypt=True;" +
-                       $"Connection Timeout=30;" + 
-                       $"Command Timeout=300;" +
-                       $"Pooling=True;" +
-                       $"Min Pool Size=0;" +
-                       $"Max Pool Size=50;" +
-                       $"Application Name=CRM-{AppInfo.VersionString};";
-            }
-            catch (Exception ex)
-            {
-                Shell.Current.DisplayAlert("Sistem",$"Connection string build error: {ex.Message}","Tamam");
-                return "Data Source=.;Initial Catalog=CRM;User ID=sa;Password=123456a.A;TrustServerCertificate=True;Encrypt=False;Connection Timeout=30;";
-            }
         }
     }
 }

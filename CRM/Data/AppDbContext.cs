@@ -62,28 +62,6 @@
             });
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                var connectionString = $"Data Source={PublicSettings.MSSQLSERVER};" +
-                                     $"Initial Catalog={PublicSettings.MSSQLDATABASE};" +
-                                     $"User ID={PublicSettings.MSSQLUSERNAME};" +
-                                     $"Password={PublicSettings.MSSQLPASSWORD};" +
-                                     $"TrustServerCertificate=True;" +
-                                     $"Encrypt=True;" +
-                                     $"Connection Timeout=30;" +
-                                     $"Command Timeout=60;" +
-                                     $"Pooling=True;";
-
-                optionsBuilder.UseSqlServer(connectionString, options =>
-                {
-                    options.CommandTimeout(300);
-                })
-                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-            }
-        }
-
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             try
@@ -133,6 +111,18 @@
         public async Task<T?> GetByIdAsync<T>(int id, CancellationToken cancellationToken = default) where T : class
         {
             return await Set<T>().FindAsync(new object[] { id }, cancellationToken);
+        }
+        public async Task EnsureDatabaseCreatedAsync()
+        {
+            try
+            {
+                await Database.EnsureCreatedAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Database creation error: {ex.Message}");
+                throw;
+            }
         }
     }
 }

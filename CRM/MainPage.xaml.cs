@@ -12,5 +12,15 @@
         {
             await BusinessAddPop.ShowAsync();
         }
+
+        private async void OnBusinessSaved(object sender, EventArgs e)
+        {
+            BusinessAddPop.Dismiss();
+
+            if (BindingContext is MainPageViewModel vm)
+            {
+                await vm.AddServiceVm.LoadBusinessListCommand.ExecuteAsync(null);
+            }
+        }
     }
 }

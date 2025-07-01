@@ -2,7 +2,7 @@
 {
     public partial class AddServiceViewModel : ObservableObject
     {
-        private readonly IDbContextFactory<AppDbContext> _contextFactory;
+        private readonly DatabaseService _databaseService;
         private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
 
         #region ObservableProperty
@@ -17,7 +17,7 @@
         private string? businessName;
 
         [ObservableProperty]
-        private bool businessTaxType;
+        private string businessTaxType = "Gerçek";
 
         [ObservableProperty]
         private string? taxNumber;
@@ -42,6 +42,9 @@
 
         [ObservableProperty]
         private int businesslastUpdateUserInd;
+
+        [ObservableProperty]
+        private Business? selectedBusiness;
         #endregion
 
         #region EXPENSE
@@ -81,7 +84,7 @@
         private int headerbusinessInd;
 
         [ObservableProperty]
-        private DateTime headerserviceDate;
+        private DateTime headerserviceDate = DateTime.Now;
 
         [ObservableProperty]
         private int headercreatorUser;
@@ -106,9 +109,43 @@
         public ObservableCollection<ServiceFormExpenseDetail> Expense { get; set; } = new ObservableCollection<ServiceFormExpenseDetail>();
         #endregion
 
-        public AddServiceViewModel(IDbContextFactory<AppDbContext> contextFactory)
+        public AddServiceViewModel(DatabaseService databaseService)
         {
-            _contextFactory = contextFactory;
+            _databaseService = databaseService;
+
+            _ = Task.Run(async () =>
+            {
+                await LoadBusinessList();
+                await EnsureDatabaseExists();
+            });
+        }
+
+        private async Task EnsureDatabaseExists()
+        {
+            try
+            {
+                await _databaseService.EnsureDatabaseCreatedAsync();
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Veritabanı Hatası",
+                    $"Veritabanı oluşturulamadı: {ex.Message}", "Tamam");
+            }
+        }
+
+        partial void OnSelectedBusinessChanged(Business? value)
+        {
+            if (value != null)
+            {
+                Businessind = value.IND;
+                Type = value.TYPE;
+                BusinessName = value.BUSINESSNAME;
+                BusinessTaxType = value.TypeText;
+                TaxNumber = value.TAXNUMBER;
+                TaxOffice = value.TAXOFFICE;
+                AuthNameAndSurname = value.AUTHNAMEANDSURNAME;
+                PhoneNumber = value.PHONENUMBER;
+            }
         }
 
         [RelayCommand]
@@ -127,7 +164,15 @@
                     return;
                 }
 
-                using var context = _contextFactory.CreateDbContext();
+                if (string.IsNullOrWhiteSpace(Type))
+                {
+                    await Shell.Current.DisplayAlert("Uyarı", "Firma türü gereklidir", "Tamam");
+                    return;
+                }
+
+                using var context = _databaseService.CreateContext();
+
+                await context.Database.EnsureCreatedAsync();
 
                 var existingBusiness = await context.BUSINESS
                     .AsNoTracking()
@@ -144,13 +189,13 @@
                 {
                     TYPE = Type,
                     BUSINESSNAME = BusinessName,
-                    BUSINESSTAXTYPE = BusinessTaxType,
+                    BUSINESSTAXTYPE = BusinessTaxType == "Tüzel",
                     TAXNUMBER = TaxNumber,
                     TAXOFFICE = TaxOffice,
                     AUTHNAMEANDSURNAME = AuthNameAndSurname,
                     PHONENUMBER = PhoneNumber,
-                    CREATEDATE = DateTime.UtcNow,
-                    LASTUPDATE = DateTime.UtcNow,
+                    CREATEDATE = DateTime.Now,
+                    LASTUPDATE = DateTime.Now,
                     CREATORUSERIND = 1,
                     LASTUPDATEUSERIND = 1
                 };
@@ -160,7 +205,10 @@
 
                 if (result > 0)
                 {
-                    Business.Add(businessitem);
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        Business.Insert(0, businessitem);
+                    });
 
                     ClearBusinessForm();
 
@@ -196,13 +244,16 @@
                 {
                     AMOUNT = 0m,
                     COMMENT = string.Empty,
-                    CREATEDDATE = DateTime.UtcNow,
-                    LASTUPDATEDATE = DateTime.UtcNow,
+                    CREATEDDATE = DateTime.Now,
+                    LASTUPDATEDATE = DateTime.Now,
                     CREATORUSERIND = 1,
                     LASTUPDATEUSERIND = 1
                 };
 
-                Expense.Add(newExpense);
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    Expense.Add(newExpense);
+                });
             }
             catch (Exception ex)
             {
@@ -215,22 +266,33 @@
         {
             try
             {
-                using var context = _contextFactory.CreateDbContext();
+                if (!await _databaseService.TestConnectionAsync())
+                {
+                    await Shell.Current.DisplayAlert("Sistem","Database connection failed, skipping business list load", "Tamam");
+                    return;
+                }
+
+                using var context = _databaseService.CreateContext();
+
+                await context.Database.EnsureCreatedAsync();
 
                 var businesses = await context.BUSINESS
                     .AsNoTracking()
                     .OrderByDescending(b => b.CREATEDATE)
                     .ToListAsync();
 
-                Business.Clear();
-                foreach (var business in businesses)
+                await MainThread.InvokeOnMainThreadAsync(() =>
                 {
-                    Business.Add(business);
-                }
+                    Business.Clear();
+                    foreach (var business in businesses)
+                    {
+                        Business.Add(business);
+                    }
+                });
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Hata", $"Müşteri listesi yüklenirken hata: {ex.Message}", "Tamam");
+                await Shell.Current.DisplayAlert("Sistem", $"Business list load error: {ex.Message}", "Tamam");
             }
         }
 
@@ -256,7 +318,7 @@
                     return;
                 }
 
-                using var context = _contextFactory.CreateDbContext();
+                using var context = _databaseService.CreateContext();
                 using var transaction = await context.Database.BeginTransactionAsync();
 
                 try
@@ -265,11 +327,11 @@
                     {
                         TYPE = 1,
                         BUSINESSIND = Businessind,
-                        ServiceDate = HeaderserviceDate == default ? DateTime.UtcNow : HeaderserviceDate,
+                        ServiceDate = HeaderserviceDate,
                         CreatorUser = 1,
-                        CreatedDate = DateTime.UtcNow,
+                        CreatedDate = DateTime.Now,
                         LASTUPDATEUSERIND = 1,
-                        LASTUPDATEDATE = DateTime.UtcNow
+                        LASTUPDATEDATE = DateTime.Now
                     };
 
                     context.SERVICEFORMHEADER.Add(header);
@@ -285,8 +347,8 @@
                             AMOUNT = e.AMOUNT,
                             COMMENT = e.COMMENT ?? string.Empty,
                             CREATORUSERIND = 1,
-                            CREATEDDATE = DateTime.UtcNow,
-                            LASTUPDATEDATE = DateTime.UtcNow,
+                            CREATEDDATE = DateTime.Now,
+                            LASTUPDATEDATE = DateTime.Now,
                             LASTUPDATEUSERIND = 1
                         }).ToList();
 
@@ -334,7 +396,7 @@
         {
             Type = string.Empty;
             BusinessName = string.Empty;
-            BusinessTaxType = false;
+            BusinessTaxType = "Gerçek";
             TaxNumber = string.Empty;
             TaxOffice = string.Empty;
             AuthNameAndSurname = string.Empty;
@@ -344,8 +406,20 @@
         private void ClearServiceForm()
         {
             Businessind = 0;
-            HeaderserviceDate = DateTime.UtcNow;
-            Expense.Clear();
+            SelectedBusiness = null;
+            HeaderserviceDate = DateTime.Now;
+            Type = string.Empty;
+            BusinessName = string.Empty;
+            BusinessTaxType = "Gerçek";
+            TaxNumber = string.Empty;
+            TaxOffice = string.Empty;
+            AuthNameAndSurname = string.Empty;
+            PhoneNumber = string.Empty;
+
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                Expense.Clear();
+            });
         }
 
         public void Dispose()
