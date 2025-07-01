@@ -66,7 +66,21 @@
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=.;Database=CRM;Trusted_Connection=true;");
+                var connectionString = $"Data Source={PublicSettings.MSSQLSERVER};" +
+                                     $"Initial Catalog={PublicSettings.MSSQLDATABASE};" +
+                                     $"User ID={PublicSettings.MSSQLUSERNAME};" +
+                                     $"Password={PublicSettings.MSSQLPASSWORD};" +
+                                     $"TrustServerCertificate=True;" +
+                                     $"Encrypt=True;" +
+                                     $"Connection Timeout=30;" +
+                                     $"Command Timeout=60;" +
+                                     $"Pooling=True;";
+
+                optionsBuilder.UseSqlServer(connectionString, options =>
+                {
+                    options.CommandTimeout(300);
+                })
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             }
         }
 
@@ -82,9 +96,10 @@
                 ChangeTracker.AutoDetectChangesEnabled = false;
                 return result;
             }
-            catch
+            catch (Exception ex)
             {
                 ChangeTracker.AutoDetectChangesEnabled = false;
+                System.Diagnostics.Debug.WriteLine($"SaveChangesAsync Error: {ex.Message}");
                 throw;
             }
         }

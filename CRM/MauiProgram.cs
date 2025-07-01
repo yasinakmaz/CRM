@@ -29,11 +29,7 @@
 
                 options.UseSqlServer(connectionString, sqlOptions =>
                 {
-                    sqlOptions.CommandTimeout(30);
-                    sqlOptions.EnableRetryOnFailure(
-                        maxRetryCount: 2,
-                        maxRetryDelay: TimeSpan.FromSeconds(5),
-                        errorNumbersToAdd: null);
+                    sqlOptions.CommandTimeout(300);
                 })
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
                 .EnableServiceProviderCaching(true);
@@ -41,7 +37,7 @@
 #if DEBUG
                 options.EnableDetailedErrors(true)
                        .EnableSensitiveDataLogging(true)
-                       .LogTo(message => System.Diagnostics.Debug.WriteLine(message), LogLevel.Warning);
+                       .LogTo(message => Shell.Current.DisplayAlert("Sql Hatası",message,"Tamam"), LogLevel.Warning);
 #endif
             });
 
@@ -69,15 +65,17 @@
                        $"Password={PublicSettings.MSSQLPASSWORD};" +
                        $"TrustServerCertificate=True;" +
                        $"Encrypt=True;" +
-                       $"Connection Timeout=15;" +
-                       $"Command Timeout=30;" +
+                       $"Connection Timeout=30;" + 
+                       $"Command Timeout=300;" +
                        $"Pooling=True;" +
+                       $"Min Pool Size=0;" +
+                       $"Max Pool Size=50;" +
                        $"Application Name=CRM-{AppInfo.VersionString};";
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Connection string build error: {ex.Message}");
-                return "Data Source=.;Initial Catalog=CRM;User ID=sa;Password=123456a.A;TrustServerCertificate=True;Encrypt=True;";
+                Shell.Current.DisplayAlert("Sistem",$"Connection string build error: {ex.Message}","Tamam");
+                return "Data Source=.;Initial Catalog=CRM;User ID=sa;Password=123456a.A;TrustServerCertificate=True;Encrypt=False;Connection Timeout=30;";
             }
         }
     }

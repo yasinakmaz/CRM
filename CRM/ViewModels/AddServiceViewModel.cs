@@ -121,7 +121,6 @@
             {
                 IsLoading = true;
 
-                // Validation
                 if (string.IsNullOrWhiteSpace(BusinessName))
                 {
                     await Shell.Current.DisplayAlert("Uyarı", "Firma adı gereklidir", "Tamam");
