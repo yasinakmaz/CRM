@@ -2,11 +2,8 @@
 {
     public class DatabaseService
     {
-        private readonly IDbContextFactory<AppDbContext> _contextFactory;
-
-        public DatabaseService(IDbContextFactory<AppDbContext> contextFactory)
+        public DatabaseService()
         {
-            _contextFactory = contextFactory;
         }
 
         public AppDbContext CreateContext()
@@ -14,7 +11,7 @@
             var connectionString = BuildConnectionString();
 
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(sqlOptions =>
+            optionsBuilder.UseSqlServer(connectionString, sqlOptions =>
             {
                 sqlOptions.CommandTimeout(300);
             })
@@ -58,7 +55,7 @@
             }
         }
 
-        private static async Task<string> BuildConnectionString()
+        private static string BuildConnectionString()
         {
             try
             {
@@ -89,7 +86,7 @@
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Sistem",$"Connection string build error: {ex.Message}","Tamam");
+                Shell.Current.DisplayAlert("Sistem",$"Connection string build error: {ex.Message}","Tamam");
                 return "Data Source=.;Initial Catalog=CRM;User ID=sa;Password=123456a.A;TrustServerCertificate=True;Encrypt=False;Connection Timeout=30;";
             }
         }

@@ -53,6 +53,9 @@
         [NotMapped]
         public string DisplayName => $"{BUSINESSNAME} ({TypeText})";
 
+        [NotMapped]
+        public TaxType TaxType { get; set; }
+
         public override string ToString()
         {
             return $"{BUSINESSNAME} - {TYPE}";

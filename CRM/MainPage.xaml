@@ -102,7 +102,7 @@
                             <datagrid:SfDataGrid.Columns>
                                 <datagrid:DataGridTextColumn MappingName="TypeText" HeaderText="Tip"/>
                                 <datagrid:DataGridTextColumn MappingName="BUSINESSNAME" HeaderText="Firma Adı"/>
-                                <datagrid:DataGridCheckBoxColumn MappingName="BUSINESSTAXTYPE" HeaderText="Vergi Tipi"/>
+                                <datagrid:DataGridTextColumn MappingName="TaxType" HeaderText="Vergi Tipi"/>
                                 <datagrid:DataGridTextColumn MappingName="TAXNUMBER" HeaderText="Vergi No"/>
                                 <datagrid:DataGridTextColumn MappingName="TAXOFFICE" HeaderText="Vergi Dairesi"/>
                                 <datagrid:DataGridTextColumn MappingName="AUTHNAMEANDSURNAME" HeaderText="Yetkili"/>

@@ -268,7 +268,7 @@
             {
                 if (!await _databaseService.TestConnectionAsync())
                 {
-                    await Shell.Current.DisplayAlert("Sistem","Database connection failed, skipping business list load", "Tamam");
+                    await Shell.Current.DisplayAlert("Sistem","Veritabanı Bağlantı Hatası","Tamam");
                     return;
                 }
 
@@ -292,7 +292,7 @@
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Sistem", $"Business list load error: {ex.Message}", "Tamam");
+                System.Diagnostics.Debug.WriteLine($"Business list load error: {ex.Message}");
             }
         }
 
@@ -408,6 +408,7 @@
             Businessind = 0;
             SelectedBusiness = null;
             HeaderserviceDate = DateTime.Now;
+
             Type = string.Empty;
             BusinessName = string.Empty;
             BusinessTaxType = "Gerçek";

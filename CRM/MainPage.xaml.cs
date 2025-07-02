@@ -6,6 +6,7 @@
         {
             InitializeComponent();
             BindingContext = viewModel;
+            LoadBusiness();
         }
 
         private async void BtnAddBusiness_Clicked(object sender, EventArgs e)
@@ -17,6 +18,14 @@
         {
             BusinessAddPop.Dismiss();
 
+            if (BindingContext is MainPageViewModel vm)
+            {
+                await vm.AddServiceVm.LoadBusinessListCommand.ExecuteAsync(null);
+            }
+        }
+
+        private async Task LoadBusiness()
+        {
             if (BindingContext is MainPageViewModel vm)
             {
                 await vm.AddServiceVm.LoadBusinessListCommand.ExecuteAsync(null);
